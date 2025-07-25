@@ -328,24 +328,24 @@ cloudProvider: 'local' // 'local', 'google-drive', 'dropbox'
 4. **Push Yapın**: Branch'inizi push edin
 5. **Pull Request**: Pull request oluşturun
 
-## 📝 Lisans
+## Lisans
 
 Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakın.
 
-## 🐛 Sorun Bildirimi
+## Sorun Bildirimi
 
 Bir hata bulduysanız veya öneriniz varsa:
 1. **Issue Oluşturun**: GitHub'da yeni issue açın
 2. **Detay Verin**: Sorunu detaylı açıklayın
 3. **Ekran Görüntüsü**: Varsa ekran görüntüsü ekleyin
 
-## 📞 İletişim
+## İletişim
 
-- **GitHub**: [@your-username](https://github.com/your-username)
-- **Email**: your-email@example.com
-- **Website**: [your-website.com](https://your-website.com)
+- **GitHub**: [@omercsbn](https://github.com/omercsbn)
+- **Email**: omercansabun@icloud.com
+- **Website**: [omercansabun.com](https://omercansabun.com)
 
-## 🙏 Teşekkürler
+## Teşekkürler
 
 - **Ekşi Sözlük**: Platform için
 - **Google Gemini**: AI analizi için
@@ -354,7 +354,7 @@ Bir hata bulduysanız veya öneriniz varsa:
 
 ---
 
-**Ekşi Map Pro** ile Ekşi Sözlük deneyiminizi bir üst seviyeye taşıyın! 🚀 
+**Ekşi Map** ile Ekşi Sözlük deneyiminizi bir üst seviyeye taşıyın! 
 
 ## 🔄 Veri Senkronizasyonu Özellikleri
 
