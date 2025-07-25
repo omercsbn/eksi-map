@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Ekşi Map",
+  "version": "1.0.0",
+  "description": "Ekşi Sözlük başlıklarını analiz edip anahtar kelimeler, ton ve ilgili başlıklar sunar.",  "permissions": ["scripting", "activeTab", "tabs"],
+  "host_permissions": [
+    "https://eksisozluk.com/*",
+    "https://www.google.com/*"
+  ],"action": {
+    "default_popup": "popup.html",
+    "default_title": "Ekşi Map"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://eksisozluk.com/*"],
+      "js": ["content.js"]
+    }
+  ],  "web_accessible_resources": [
+    {
+      "resources": ["config.js", "chart.min.js", "local-config.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

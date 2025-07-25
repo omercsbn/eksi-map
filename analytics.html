@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekşi Map Analytics Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --success-color: #4facfe;
+            --warning-color: #43e97b;
+            --danger-color: #fa709a;
+            --dark-bg: #1a1a2e;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8b8;
+            --border-radius: 16px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--accent-color), var(--success-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--accent-color), var(--success-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: var(--transition);
+        }
+
+        .chart-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chart-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9em;
+        }
+
+        .chart-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .insights-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .insights-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .insights-title {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--warning-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .insight-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+        }
+
+        .insight-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .insight-icon {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .insight-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .insight-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .recommendations-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid var(--success-color);
+            transition: var(--transition);
+        }
+
+        .recommendation-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .recommendation-item.high {
+            border-left-color: var(--danger-color);
+        }
+
+        .recommendation-item.medium {
+            border-left-color: var(--warning-color);
+        }
+
+        .recommendation-icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+        }
+
+        .recommendation-content h4 {
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+
+        .recommendation-content p {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2em;
+            color: var(--text-secondary);
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-secondary);
+            border-top: 2px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .export-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .export-btn {
+            background: linear-gradient(45deg, var(--accent-color), var(--success-color));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin: 0 10px;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 10px;
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-controls {
+                flex-direction: column;
+            }
+
+            .export-btn {
+                display: block;
+                margin: 10px auto;
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="popup.html" class="back-btn">← Geri</a>
+
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>📊 Analytics Dashboard</h1>
+            <p>Okuma alışkanlıklarınızı analiz edin ve kişisel içgörüler keşfedin</p>
+        </div>
+
+        <!-- Performance Stats -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="loading">İstatistikler yükleniyor...</div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="chart-grid">
+            <!-- Reading Trends Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">📈 Okuma Trendleri</h3>
+                    <div class="chart-controls">
+                        <button class="chart-btn" data-chart="trends" data-period="daily">Günlük</button>
+                        <button class="chart-btn" data-chart="trends" data-period="weekly">Haftalık</button>
+                        <button class="chart-btn" data-chart="trends" data-period="monthly">Aylık</button>
+                    </div>
+                </div>
+                <div class="chart-container" id="trendsChart">
+                    <div class="loading">Grafik yükleniyor...</div>
+                </div>
+            </div>
+
+            <!-- Sentiment Evolution Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">😊 Duygu Tonu Evrimi</h3>
+                    <div class="chart-controls">
+                        <button class="chart-btn" data-chart="sentiment" data-type="line">Çizgi</button>
+                        <button class="chart-btn" data-chart="sentiment" data-type="bar">Sütun</button>
+                    </div>
+                </div>
+                <div class="chart-container" id="sentimentChart">
+                    <div class="loading">Grafik yükleniyor...</div>
+                </div>
+            </div>
+
+            <!-- Topic Clusters Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">🗂️ Konu Kümeleri</h3>
+                    <div class="chart-controls">
+                        <button class="chart-btn" data-chart="topics" data-type="doughnut">Halka</button>
+                        <button class="chart-btn" data-chart="topics" data-type="bar">Sütun</button>
+                    </div>
+                </div>
+                <div class="chart-container" id="topicsChart">
+                    <div class="loading">Grafik yükleniyor...</div>
+                </div>
+            </div>
+
+            <!-- Keyword Network Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">🔗 Anahtar Kelime Ağı</h3>
+                    <div class="chart-controls">
+                        <button class="chart-btn" data-chart="network" data-type="force">Kuvvet</button>
+                        <button class="chart-btn" data-chart="network" data-type="circular">Dairesel</button>
+                    </div>
+                </div>
+                <div class="chart-container" id="networkChart">
+                    <div class="loading">Grafik yükleniyor...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personal Insights -->
+        <div class="insights-section">
+            <div class="insights-header">
+                <h2 class="insights-title">🎯 Kişisel İçgörüler</h2>
+                <p>Okuma alışkanlıklarınız hakkında özel analizler</p>
+            </div>
+            <div class="insights-grid" id="insightsGrid">
+                <div class="loading">İçgörüler yükleniyor...</div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="recommendations-section">
+            <div class="insights-header">
+                <h2 class="insights-title">💡 Öneriler</h2>
+                <p>Okuma deneyiminizi geliştirmek için kişiselleştirilmiş öneriler</p>
+            </div>
+            <div id="recommendationsList">
+                <div class="loading">Öneriler yükleniyor...</div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <button class="export-btn" id="exportJSON">📄 JSON İndir</button>
+            <button class="export-btn" id="exportCSV">📊 CSV İndir</button>
+            <button class="export-btn" id="exportPNG">🖼️ PNG İndir</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="chart.min.js"></script>
+    <script src="analytics-engine.js"></script>
+    <script src="analytics.js"></script>
+</body>
+</html> 

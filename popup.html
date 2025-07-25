@@ -1,0 +1,375 @@
+<!-- popup.html (isteğe bağlı, DOM inject ile benzer görsel sunum) -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ekşi Map</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      min-width: 320px;
+      min-height: 400px;
+    }
+    
+    .container {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      margin: 10px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .logo {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    
+    .title {
+      font-size: 1.4em;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+    
+    .subtitle {
+      color: #7f8c8d;
+      font-size: 0.9em;
+    }
+    
+    .status-card {
+      background: linear-gradient(135deg, #74b9ff, #0984e3);
+      color: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(116, 185, 255, 0.3);
+    }
+    
+    .status-card.success {
+      background: linear-gradient(135deg, #00b894, #00a085);
+      box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+    }
+    
+    .status-card.error {
+      background: linear-gradient(135deg, #e17055, #d63031);
+      box-shadow: 0 4px 15px rgba(225, 112, 85, 0.3);
+    }
+    
+    .feature-list {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+    
+    .feature-list li {
+      padding: 8px 0;
+      display: flex;
+      align-items: center;
+      color: #2c3e50;
+    }
+    
+    .feature-list li::before {
+      content: "✨";
+      margin-right: 10px;
+      font-size: 1.1em;
+    }
+    
+    .note {
+      background: #f8f9fa;
+      border-left: 4px solid #007bff;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.9em;
+      color: #6c757d;
+      margin-bottom: 20px;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e9ecef;
+    }
+    
+    .stat-number {
+      font-size: 1.8em;
+      font-weight: 700;
+      color: #007bff;
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      font-size: 0.8em;
+      color: #6c757d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .action-btn {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9em;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+    }
+    
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+    }
+    
+    .action-btn.secondary {
+      background: linear-gradient(135deg, #6c757d, #495057);
+      box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+    }
+    
+    .action-btn.secondary:hover {
+      box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+    }
+    
+    .footer {
+      text-align: center;
+      padding-top: 15px;
+      border-top: 1px solid #e9ecef;
+      color: #6c757d;
+      font-size: 0.8em;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Notification settings styles */
+    .notification-settings {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding: 8px 0;
+    }
+
+    .setting-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .setting-label {
+      font-size: 0.9em;
+      color: #2c3e50;
+      font-weight: 500;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #007bff;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    .realtime-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 0.9em;
+    }
+
+    .realtime-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">🧠</div>
+      <div class="title">Ekşi Map Pro</div>
+      <div class="subtitle">Zihin Haritası & Analiz Aracı</div>
+    </div>
+    
+    <div id="status" class="status-card">
+      <div class="loading"></div> Durum kontrol ediliyor...
+    </div>
+
+    <!-- Real-time monitoring status -->
+    <div class="realtime-status">
+      <div class="realtime-indicator"></div>
+      <span>🔄 Gerçek Zamanlı İzleme Aktif</span>
+    </div>
+    
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-number" id="analysisCount">0</div>
+        <div class="stat-label">Analiz</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="keywordCount">0</div>
+        <div class="stat-label">Kelime</div>
+      </div>
+    </div>
+    
+    <div class="navigation-buttons">
+      <button id="settings-btn" class="nav-btn">⚙️ Ayarlar</button>
+      <button id="map-btn" class="nav-btn">🗺️ Harita</button>
+      <button id="history-btn" class="nav-btn">📚 Geçmiş</button>
+      <button id="analysis-btn" class="nav-btn">🧠 Analiz</button>
+      <button id="dashboard-btn" class="nav-btn">📊 Dashboard</button>
+      <button id="search-btn" class="nav-btn">🔍 Ara</button>
+      <button id="sync-btn" class="nav-btn">🔄 Senkronizasyon</button>
+      <button id="ai-recommendations-btn" class="nav-btn">🤖 AI Öneriler</button>
+    </div>
+
+    <!-- Notification settings -->
+    <div class="notification-settings">
+      <h4 style="margin-bottom: 15px; color: #2c3e50;">🔔 Bildirim Ayarları</h4>
+      
+      <div class="setting-item">
+        <span class="setting-label">Tarayıcı Bildirimleri</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="browserNotifications" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="setting-item">
+        <span class="setting-label">Sayfa İçi Bildirimler</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="inPageNotifications" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="setting-item">
+        <span class="setting-label">Gerçek Zamanlı İzleme</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="realtimeMonitoring" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+    
+    <ul class="feature-list">
+      <li>Başlık özeti ve duygu tonu analizi</li>
+      <li>Anahtar kelimeler ve ilgili başlıklar</li>
+      <li>Görsel bubble chart haritası</li>
+      <li>Kişisel analiz geçmişi</li>
+      <li>Gerçek zamanlı değişiklik izleme</li>
+    </ul>
+    
+    <div class="note">
+      <strong>💡 İpucu:</strong> Ekşi Sözlük'te bir başlık sayfasındayken sağ alttaki "Analiz" butonuna tıklayarak başlığı analiz edebilirsin.
+    </div>
+    
+    <div class="footer">
+      v2.0.0 • Made with ❤️ for Ekşi Sözlük
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

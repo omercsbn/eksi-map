@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart.js Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .loading { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chart.js Test Sayfası</h1>
+        
+        <div id="status" class="status loading">Chart.js yükleniyor...</div>
+        
+        <div style="margin: 20px 0;">
+            <button onclick="loadChartJs()">Chart.js Yükle</button>
+            <button onclick="testChart()">Chart Test Et</button>
+            <button onclick="clearChart()">Chart Temizle</button>
+        </div>
+        
+        <canvas id="testChart" width="600" height="400"></canvas>
+        
+        <div id="log" style="margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;">
+            <strong>Log:</strong><br>
+        </div>
+    </div>
+
+    <script>
+        let chart = null;
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function updateStatus(message, type = 'loading') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+        
+        function loadChartJs() {
+            log('Chart.js yükleniyor...');
+            updateStatus('Chart.js yükleniyor...', 'loading');
+            
+            // Önce local dosyayı dene
+            const localScript = document.createElement('script');
+            localScript.src = 'chart.min.js';
+            localScript.onload = function() {
+                log('Local Chart.js yüklendi');
+                updateStatus('Local Chart.js yüklendi', 'success');
+                testChart();
+            };
+            localScript.onerror = function() {
+                log('Local Chart.js başarısız, CDN deneniyor...');
+                loadFromCDN();
+            };
+            document.head.appendChild(localScript);
+        }
+        
+        function loadFromCDN() {
+            const cdnScript = document.createElement('script');
+            cdnScript.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js';
+            cdnScript.onload = function() {
+                log('CDN Chart.js yüklendi');
+                updateStatus('CDN Chart.js yüklendi', 'success');
+                testChart();
+            };
+            cdnScript.onerror = function() {
+                log('CDN Chart.js başarısız, alternatif CDN deneniyor...');
+                loadFromAlternativeCDN();
+            };
+            document.head.appendChild(cdnScript);
+        }
+        
+        function loadFromAlternativeCDN() {
+            const altScript = document.createElement('script');
+            altScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js';
+            altScript.onload = function() {
+                log('Alternatif CDN Chart.js yüklendi');
+                updateStatus('Alternatif CDN Chart.js yüklendi', 'success');
+                testChart();
+            };
+            altScript.onerror = function() {
+                log('Tüm Chart.js kaynakları başarısız!');
+                updateStatus('Chart.js yüklenemedi!', 'error');
+            };
+            document.head.appendChild(altScript);
+        }
+        
+        function testChart() {
+            log('Chart test ediliyor...');
+            
+            if (!window.Chart) {
+                log('Chart objesi bulunamadı!');
+                updateStatus('Chart objesi bulunamadı!', 'error');
+                return;
+            }
+            
+            log('Chart objesi mevcut: ' + typeof window.Chart);
+            
+            const ctx = document.getElementById('testChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+            
+            try {
+                chart = new window.Chart(ctx, {
+                    type: 'bubble',
+                    data: {
+                        datasets: [{
+                            label: 'Test Verisi',
+                            data: [
+                                { x: 20, y: 30, r: 15 },
+                                { x: 40, y: 10, r: 10 },
+                                { x: 60, y: 50, r: 20 },
+                                { x: 80, y: 20, r: 12 }
+                            ],
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Chart.js Test - Bubble Chart'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'X Ekseni' },
+                                min: 0,
+                                max: 100
+                            },
+                            y: {
+                                title: { display: true, text: 'Y Ekseni' },
+                                min: 0,
+                                max: 60
+                            }
+                        }
+                    }
+                });
+                
+                log('Chart başarıyla oluşturuldu!');
+                updateStatus('Chart başarıyla oluşturuldu!', 'success');
+                
+            } catch (error) {
+                log('Chart oluşturma hatası: ' + error.message);
+                updateStatus('Chart oluşturma hatası: ' + error.message, 'error');
+            }
+        }
+        
+        function clearChart() {
+            if (chart) {
+                chart.destroy();
+                chart = null;
+                log('Chart temizlendi');
+                updateStatus('Chart temizlendi', 'loading');
+            }
+        }
+        
+        // Sayfa yüklendiğinde otomatik test
+        window.addEventListener('load', function() {
+            log('Sayfa yüklendi, Chart.js test ediliyor...');
+            setTimeout(loadChartJs, 1000);
+        });
+    </script>
+</body>
+</html> 
